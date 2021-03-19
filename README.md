@@ -3,6 +3,6 @@
 
 # TODO
 - [x] Pytorch Kmeans clustering implementation
-- [] Rewrite Deep subspace clustering network
-- [] Utilits functions.
-- [] Evaluation on BSDS500
+- [ ] Rewrite Deep subspace clustering network
+- [ ] Utilits functions.
+- [ ] Evaluation on BSDS500
