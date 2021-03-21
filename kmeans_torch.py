@@ -69,7 +69,7 @@ class kmeans_core:
                     print("Centroids is not shifting anymore")
                     break
                     
-        t = trange(self.iters)
+        # t = trange(self.iters)
         
         for i in t:
             dt = self.get_data(self.index)
