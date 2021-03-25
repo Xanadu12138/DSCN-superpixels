@@ -6,8 +6,8 @@ import copy
 def extractPixelBlock(originalImg, labels):
     '''
     input_param:
-        originalImg: Original pixels matrix of input img. np.ndarray
-        label: label matrix of input img. np.ndarray
+        originalImg: Original pixels matrix that squeezed to 2 dimentions of input img. np.ndarray
+        labels: label matrix of input img. np.ndarray
     output_param:
         pixelBlockList: a list contains all pixelblock which incoporates same label pixels.
     '''
@@ -27,15 +27,30 @@ def extractPixelBlock(originalImg, labels):
         pixelBlock = pixelBlock.reshape(config.imgSize[0], config.imgSize[1], -1)
         pixelBlockList.append(pixelBlock)
 
-    # pixelBlockList = np.array(pixelBlockList)
-
     return pixelBlockList
 
-def extractFeature(elementlist):
+def extractFeature(pixelBlockList):
     '''
     input_param:
-        elementlist: A list contains all element.
+        pixelBlockList: A list contains all element.
     output_param:
-        featurelist: A list contains each element's feature.
+        featureList: A list contains each element's feature. feature contains 3 channel's mean value and mean position info.
     '''
-    pass
+    featureList = []
+    
+    for i in range(len(pixelBlockList)):
+        pixelList = []
+        locationList = []
+
+        for y in range(len(pixelBlockList[0])):
+            for x in range(len(pixelBlockList[1])):
+                if pixelBlockList[i][y][x] != -1:
+                    pixelList.append(list(pixelBlockList[i][y][x]))
+                    locationList.append((x,y))
+
+        colorFeature = np.mean(np.array(pixelList), axis=0)
+        locationFeature = np.mean(np.array(locationList), axis=0)
+        features = np.append(colorFeature, locationFeature)
+        featureList.append(features)
+
+    return featureList

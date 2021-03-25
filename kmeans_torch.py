@@ -85,7 +85,7 @@ class kmeans_core:
 
     def step(self, dt):
         idx = self.calc_idx(dt)
-        # self.new_c(idx, dt)
+        self.new_c(idx, dt)
 
     def calc_distance(self, dt):
         bs = dt.size()[0]

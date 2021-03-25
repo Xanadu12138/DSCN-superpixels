@@ -8,7 +8,7 @@ trainDataPath = './datasets/images/train'
 imgSize = [321, 481]
 
 # Initialization parameters
-K = 4
+K = 1000
 
 # DSCN paramters
 # num_sample = x.shape[0]
