@@ -53,4 +53,6 @@ def extractFeature(pixelBlockList):
         features = np.append(colorFeature, locationFeature)
         featureList.append(features)
 
+    
+    featureList = np.array(featureList)
     return featureList

@@ -109,6 +109,29 @@ class ConvAE(nn.Module):
         y = self.decoder(hidden)
         return y
 
+class AutoEncoder(nn.Module):
+    def __init__(self, channels):
+        '''
+        param:
+            channels: a list containing all channels in the network.
+            kernels:  a list containing all kernels in the network.
+        '''
+        super(ConvAE, self).__init__()
+        self.encoder = nn.Sequential()
+        for i in range(len(channels) - 1):
+            self.encoder.add_module('fc%d' % (i + 1), nn.Linear(channels[i], channels[i+1]))
+            self.encoder.add_module('relu%d' % (i + 1), nn.ReLU(True))
+
+        channels = list(reversed(channels))
+        self.decoder = nn.Sequential()
+        for i in range(len(channels) - 1):
+            self.decoder.add_module('deconv%d' % (i + 1), nn.Linear(channels[i], channels[i + 1]))
+            self.decoder.add_module('relu%d' % i, nn.ReLU(True))
+
+    def forward(self, x):
+        hidden = self.encoder(x)
+        y = self.decoder(hidden)
+        return y
 
 class SelfExpression(nn.Module):
     def __init__(self, n):
@@ -120,11 +143,12 @@ class SelfExpression(nn.Module):
         return y 
 
 class DSCNet(nn.Module):
-    def __init__(self, channels, kernels, num_sample, x):
+    def __init__(self, channels, num_sample, x):
         super(DSCNet, self).__init__()
         self.x = x
         self.n = num_sample
-        self.ae = ConvAE(channels, kernels)
+        # self.ae = ConvAE(channels, kernels)
+        self.ae = AutoEncoder(channels)
         self.self_expression = SelfExpression(self.n)
         
     def forward(self, x):
