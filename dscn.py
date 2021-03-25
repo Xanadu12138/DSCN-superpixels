@@ -116,7 +116,7 @@ class AutoEncoder(nn.Module):
             channels: a list containing all channels in the network.
             kernels:  a list containing all kernels in the network.
         '''
-        super(ConvAE, self).__init__()
+        super(AutoEncoder, self).__init__()
         self.encoder = nn.Sequential()
         for i in range(len(channels) - 1):
             self.encoder.add_module('fc%d' % (i + 1), nn.Linear(channels[i], channels[i+1]))
@@ -143,9 +143,9 @@ class SelfExpression(nn.Module):
         return y 
 
 class DSCNet(nn.Module):
-    def __init__(self, channels, num_sample, x):
+    def __init__(self, channels, num_sample, pixelBlockList):
         super(DSCNet, self).__init__()
-        self.x = x
+        self.pixelBlockList = pixelBlockList
         self.n = num_sample
         # self.ae = ConvAE(channels, kernels)
         self.ae = AutoEncoder(channels)
