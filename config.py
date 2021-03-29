@@ -9,12 +9,12 @@ trainDataPath = './datasets/images/train'
 imgSize = [321, 481]
 
 # Initialization parameters
-K = 10
+K = 100
 
 # DSCN paramters
 channels = [5, 10]
+
 # num_sample = x.shape[0]
-channels = [1, 5]
 kernels = [3]
 num_epoch = 500
 weight_coef = 1.0
@@ -27,5 +27,13 @@ alapha = 0.4 # threshold of C
 dim_subspace = 3 #dimension of each subspace
 ro = 8
 
+# SLIC connectivity parmeters
+segment_size = 321 * 481 / 200
+min_size = int(0.03 * segment_size)
+max_size = int(1.5 * segment_size)
+
+# imgprocess parameters
+blankBlock = [-1, -1, -1]
+
 # save path
-savePath = './DSCNet/' + dataName + '.pt'
+savePath = './savedmoudle/' + dataName + '.pt'

@@ -11,7 +11,7 @@ def extractPixelBlock(originalImg, labels):
     output_param:
         pixelBlockList: a list contains all pixelblock which incoporates same label pixels.
     '''
-    # Copy a new labels due to max() function alter dimentions of its parameter
+    # Copy a new labels due to max() function alters dimentions of its parameter
     newLabels = copy.deepcopy(labels)
     maxLabel = max(newLabels)
     pixelBlockList = []
@@ -22,7 +22,7 @@ def extractPixelBlock(originalImg, labels):
     for i in range(maxLabel + 1):
         # Uncomment line24 and comment line25 to visualize pixelBlock.
         # pixelBlock = [pixel if label == i else blankBlock for pixel, label in zip(originalImg, labels)]
-        pixelBlock = [pixel if label == i else -1 for pixel, label in zip(originalImg, labels)]
+        pixelBlock = [pixel if label == i else config.blankBlock for pixel, label in zip(originalImg, labels)]
         pixelBlock = np.array(pixelBlock)
         pixelBlock = pixelBlock.reshape(config.imgSize[0], config.imgSize[1], -1)
         pixelBlockList.append(pixelBlock)
@@ -44,7 +44,7 @@ def extractFeature(pixelBlockList):
 
         for y in range(len(pixelBlockList[0])):
             for x in range(len(pixelBlockList[1])):
-                if pixelBlockList[i][y][x] != -1:
+                if (pixelBlockList[i][y][x] != config.blankBlock).any():
                     pixelList.append(list(pixelBlockList[i][y][x]))
                     locationList.append((x,y))
 

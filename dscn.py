@@ -114,7 +114,6 @@ class AutoEncoder(nn.Module):
         '''
         param:
             channels: a list containing all channels in the network.
-            kernels:  a list containing all kernels in the network.
         '''
         super(AutoEncoder, self).__init__()
         self.encoder = nn.Sequential()

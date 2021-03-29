@@ -1,15 +1,19 @@
 import os 
 
 import numpy as np
+from numpy.lib.type_check import imag
 from sklearn import cluster
 from scipy.sparse.linalg import svds
 from sklearn.preprocessing import normalize
 from sklearn.metrics import normalized_mutual_info_score, adjusted_rand_score, adjusted_mutual_info_score
 
+import config
+
 def getAllName(dir):
     fileList = list(map(lambda fileName: os.path.join(dir, fileName), os.listdir(dir)))
     return fileList
 
+#  Clustering functions
 def thrC(C, alpha):
     if alpha < 1:
         N = C.shape[1]
@@ -56,3 +60,55 @@ def post_proC(C, K, d, ro):
     spectral.fit(L)
     grp = spectral.fit_predict(L)
     return grp, L
+
+def spectral_clustering(C, K, d, alpha, ro):
+    C = thrC(C, alpha)
+    y, _ = post_proC(C, K, d, ro)
+    return y
+
+# Reconstruction functions
+def reconLabel(labels, pixelBlockList):
+    '''
+    input_param:
+        labels: Subspace clustering labels.
+        pixelBlockList: A list contains all element.
+    output_param:
+        reconLabel: reconstructed label matrix.
+    '''
+    
+    reconLabel = np.zeros(config.imgSize)
+    for label, pixelBlock in zip(labels, pixelBlockList):
+        
+        pixelBlock = pixelBlock.reshape((-1,3))
+        pixelBlock = list(pixelBlock)
+        #print(pixelBlock.shape)
+        for idx, item in enumerate(pixelBlock):
+            # print(item)
+            if (item == config.blankBlock).all():
+                pixelBlock[idx] = 0
+                
+            else:
+                pixelBlock[idx] = label
+
+        pixelBlock = np.array(pixelBlock)
+        pixelBlock = pixelBlock.reshape(config.imgSize)
+        reconLabel = reconLabel + pixelBlock
+
+    return reconLabel
+
+if __name__ == '__main__':
+    test =[[[1, 1, 1],[0, 0, 0],[0, 0, 0]],
+                    [[0, 0, 0],
+                    [2, 2, 2],
+                    [0, 0, 0]],
+                    [[0, 0, 0],
+                    [0, 0, 0],
+                    [3, 3, 3]]]
+
+    test = np.array(test)
+    print(test.shape)
+
+    labels = [1 ,0 , 1]
+
+    recon = reconLabel(labels, test)
+    print(recon)

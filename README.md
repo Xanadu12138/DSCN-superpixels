@@ -2,7 +2,8 @@
  Superpixels segmention via deep subspace clustering network
 
 # TODO
-- [x] Pytorch Kmeans clustering implementation
-- [ ] Rewrite Deep subspace clustering network
-- [ ] Utilits functions.
-- [ ] Evaluation on BSDS500
+- [x] Pytorch Kmeans clustering implementation.
+- [x] Rewrite Deep subspace clustering network.
+- [x] Utilits functions.
+- [ ] Optimize utilits functions.
+- [ ] Evaluation on BSDS500.

@@ -2,3 +2,4 @@ datasets/*
 __pycache__
 *test.py
 kmeans_pytorch
+savedmoudle/*
