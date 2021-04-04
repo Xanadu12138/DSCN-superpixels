@@ -2,6 +2,8 @@
 import config
 import numpy as np
 import copy
+import torch
+
 
 def extractPixelBlock(originalImg, labels):
     '''
@@ -56,3 +58,34 @@ def extractFeature(pixelBlockList):
     
     featureList = np.array(featureList)
     return featureList
+
+# Optimized version
+def regionColorFeatures(img, labels):
+    '''
+    input_param:
+        img: img matrix. torch.tensor
+        labels: Kmeans clustering labels. torch.tensor
+    output_param:
+        colorFeatureList: A list contains each element's feature. feature contains 3 channel's mean value.
+    '''
+    numlab = max(labels)
+    rlabels = labels.view(config.imgSize)
+
+    colorFeatureList = []
+    
+    redFrame = img[:, :, 0]
+    greenFrame = img[:, :, 1]
+    blueFrame = img[:, :, 2]
+    for i in range(numlab + 1):
+        f = torch.eq(rlabels, i)
+        redSpLocal = torch.mean(redFrame[f].float())
+        greenSpLocal = torch.mean(greenFrame[f].float())
+        blueSpLocal = torch.mean(blueFrame[f].float())
+        colorFeature = [redSpLocal, greenSpLocal, blueSpLocal]
+        colorFeatureList.append(colorFeature)
+
+    colorFeatureList = torch.tensor(colorFeatureList)
+
+    return colorFeatureList
+    
+   

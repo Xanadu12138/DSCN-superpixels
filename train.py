@@ -48,7 +48,7 @@ x = torch.tensor(featureList, dtype = torch.float32)
 x = x.cuda() if config.use_cuda else x 
 
 
-K = 20
+K = 40
 
 DSCN = dscn.DSCNet(config.channels, num_sample, pixelBlockList)
 if config.use_cuda:
@@ -89,7 +89,6 @@ y_pred = utilits.spectral_clustering(C, K , config.dim_subspace, config.alapha, 
 
 img = np.array(img)
 reconLabel = utilits.reconLabel(y_pred, pixelBlockList)
-print(reconLabel)
 reconLabel = reconLabel.reshape(1, 321, 481)
 slic_result = _enforce_label_connectivity_cython(reconLabel.astype(np.int64), config.min_size, config.max_size)
 slic_result = slic_result.squeeze()

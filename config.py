@@ -9,8 +9,7 @@ trainDataPath = './datasets/images/train'
 imgSize = [321, 481]
 
 # Initialization parameters
-K = 100
-
+K = 1000
 # DSCN paramters
 channels = [5, 10]
 
@@ -28,9 +27,9 @@ dim_subspace = 3 #dimension of each subspace
 ro = 8
 
 # SLIC connectivity parmeters
-segment_size = 321 * 481 / 200
-min_size = int(0.03 * segment_size)
-max_size = int(1.5 * segment_size)
+segment_size = 321 * 481 / 40
+min_size = int(0.02 * segment_size)
+max_size = int(0.5 * segment_size)
 
 # imgprocess parameters
 blankBlock = [-1, -1, -1]
