@@ -142,9 +142,9 @@ class SelfExpression(nn.Module):
         return y 
 
 class DSCNet(nn.Module):
-    def __init__(self, channels, num_sample, pixelBlockList):
+    def __init__(self, channels, num_sample):
         super(DSCNet, self).__init__()
-        self.pixelBlockList = pixelBlockList
+        # self.pixelBlockList = pixelBlockList
         self.n = num_sample
         # self.ae = ConvAE(channels, kernels)
         self.ae = AutoEncoder(channels)

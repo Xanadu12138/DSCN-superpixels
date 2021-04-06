@@ -11,7 +11,7 @@ imgSize = [321, 481]
 # Initialization parameters
 K = 1000
 # DSCN paramters
-channels = [5, 10]
+channels = [11, 22]
 
 # num_sample = x.shape[0]
 kernels = [3]
@@ -29,7 +29,7 @@ ro = 8
 # SLIC connectivity parmeters
 segment_size = 321 * 481 / 40
 min_size = int(0.02 * segment_size)
-max_size = int(0.5 * segment_size)
+max_size = int(3 * segment_size)
 
 # imgprocess parameters
 blankBlock = [-1, -1, -1]

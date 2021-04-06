@@ -1,8 +1,10 @@
 # Functions of img processing.
+from functools import total_ordering
 import config
 import numpy as np
 import copy
 import torch
+import cv2
 
 from skimage.color import rgb2gray
 from XCSLBP import XCSLBP
@@ -93,6 +95,11 @@ def regionColorFeatures(img, labels):
     return colorFeatureList
     
 def regionTextureFeatures(img, labels):
+    '''
+    input_param:
+        img: CV2.imread
+        labels
+    '''
     numlab = max(labels)
     rlabels = labels.view(config.imgSize)
 
@@ -113,3 +120,59 @@ def regionTextureFeatures(img, labels):
 
     return textureFeatureList
    
+def regionEdgeFeatures(img, labels):
+    '''
+    input_param:
+        img: CV2.imread
+        labels
+    '''
+    numlab = max(labels)
+    rlabels = labels.view(config.imgSize)
+
+    # frame = rgb2gray(img)
+
+    Gx = cv2.Sobel(img, cv2.CV_64F, 1, 0)
+    Gy = cv2.Sobel(img, cv2.CV_64F, 0, 1)
+
+    Gmag = np.sqrt(Gx**2.0 + Gy**2.0)
+    Gdir = np.arctan2(Gy, Gx) * (180 / np.pi)
+
+    Gx, Gy, Gmag, Gdir = torch.tensor(Gx), torch.tensor(Gy), torch.tensor(Gmag), torch.tensor(Gdir)
+
+    edgeFeatureList = []
+
+    for i in range(numlab + 1):
+        f = torch.eq(rlabels, i)
+        GxSpLocal = torch.mean(Gx[f].float())
+        GySpLocal = torch.mean(Gy[f].float())
+        GmagSpLocal = torch.mean(Gmag[f].float())
+        GdirSpLocal = torch.mean(Gdir[f].float())
+        edgeFeature = [GxSpLocal, GySpLocal, GmagSpLocal, GdirSpLocal]
+        edgeFeatureList.append(edgeFeature)
+
+    edgeFeatureList = torch.tensor(edgeFeatureList)
+
+    return edgeFeatureList
+
+def regionSpatialFeatures(labels):
+    numlab = max(labels)
+    rlabels = labels.view(config.imgSize)
+
+    col, row = config.imgSize
+    x = range(1, col + 1)
+    y = range(1, row + 1)
+    Sx, Sy = np.meshgrid(y, x)
+    Sx, Sy = torch.tensor(Sx), torch.tensor(Sy)
+
+    spatialFeatureList = []
+
+    for i in range(numlab + 1):
+        f = torch.eq(rlabels, i)
+        SxSpLocal = torch.mean(Sx[f].float())
+        SySpLocal = torch.mean(Sy[f].float())
+        spatialFeature = [SxSpLocal, SySpLocal]
+        spatialFeatureList.append(spatialFeature)
+
+    spatialFeatureList = torch.tensor(spatialFeatureList)
+
+    return spatialFeatureList

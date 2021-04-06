@@ -11,6 +11,7 @@ import imgprocess
 import utilits
 
 import matplotlib.pyplot as plt
+import cv2
 
 import config
 import dscn
@@ -26,6 +27,7 @@ fileList = utilits.getAllName(img_path)
 # It is a little experiment, hence I only use one image.
 file = fileList[0]
 img = plt.imread(file)
+imgCV = cv2.imread(file)
 
 
 
@@ -35,22 +37,23 @@ imgWriteable = imgWriteable.reshape(-1, 3)
 imgTensor = torch.from_numpy(imgWriteable)
 
 labels, clusterCenters = kmeans(X= imgTensor, num_clusters= config.K, distance='euclidean', device=torch.device('cuda:0'))
-labels = np.array(labels)
+imgTensor = imgTensor.view((config.imgSize[0],config.imgSize[1], 3))
 
-pixelBlockList = imgprocess.extractPixelBlock(imgWriteable, labels)
-featureList = imgprocess.extractFeature(pixelBlockList)
-
-assert len(pixelBlockList) == len(featureList)
+colorFeatureList = imgprocess.regionColorFeatures(imgTensor, labels)
+textureFeatureList = imgprocess.regionTextureFeatures(imgCV, labels)
+edgeFeatureList = imgprocess.regionEdgeFeatures(imgCV, labels)
+spatialFeatureList = imgprocess.regionSpatialFeatures(labels)
+featureList = torch.cat((colorFeatureList, textureFeatureList, edgeFeatureList, spatialFeatureList), dim = 1)
 
 num_sample = len(featureList)
 
-x = torch.tensor(featureList, dtype = torch.float32)
-x = x.cuda() if config.use_cuda else x 
+
+featureList = featureList.cuda() if config.use_cuda else featureList
 
 
-K = 40
+K = 200
 
-DSCN = dscn.DSCNet(config.channels, num_sample, pixelBlockList)
+DSCN = dscn.DSCNet(config.channels, num_sample)
 if config.use_cuda:
     DSCN = DSCN.cuda()
 
