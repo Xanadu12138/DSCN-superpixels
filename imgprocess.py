@@ -4,6 +4,8 @@ import numpy as np
 import copy
 import torch
 
+from skimage.color import rgb2gray
+from XCSLBP import XCSLBP
 
 def extractPixelBlock(originalImg, labels):
     '''
@@ -73,19 +75,41 @@ def regionColorFeatures(img, labels):
 
     colorFeatureList = []
     
+    grayFrame = torch.tensor(rgb2gray(img))
     redFrame = img[:, :, 0]
     greenFrame = img[:, :, 1]
     blueFrame = img[:, :, 2]
     for i in range(numlab + 1):
         f = torch.eq(rlabels, i)
+        graySpLocal = torch.mean(grayFrame[f].float())
         redSpLocal = torch.mean(redFrame[f].float())
         greenSpLocal = torch.mean(greenFrame[f].float())
         blueSpLocal = torch.mean(blueFrame[f].float())
-        colorFeature = [redSpLocal, greenSpLocal, blueSpLocal]
+        colorFeature = [redSpLocal, greenSpLocal, blueSpLocal, graySpLocal]
         colorFeatureList.append(colorFeature)
 
     colorFeatureList = torch.tensor(colorFeatureList)
 
     return colorFeatureList
     
+def regionTextureFeatures(img, labels):
+    numlab = max(labels)
+    rlabels = labels.view(config.imgSize)
+
+    # I = rgb2gray(img)
+    XCS = XCSLBP(img)
+
+    XCS = XCS * (255/ 16)
+    XCSframe = torch.tensor(XCS)
+    
+    textureFeatureList = []
+    for i in range(numlab + 1):
+        f = torch.eq(rlabels, i)
+        XCSSpLocal = torch.mean(XCSframe[f].float())
+        textureFeatureList.append(XCSSpLocal)
+
+    textureFeatureList = torch.tensor(textureFeatureList)
+    textureFeatureList = textureFeatureList.unsqueeze(1)
+
+    return textureFeatureList
    
