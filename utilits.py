@@ -7,6 +7,8 @@ from scipy.sparse.linalg import svds
 from sklearn.preprocessing import normalize
 from sklearn.metrics import normalized_mutual_info_score, adjusted_rand_score, adjusted_mutual_info_score
 
+import torch
+
 import config
 
 def getAllName(dir):
@@ -95,6 +97,25 @@ def reconLabel(labels, pixelBlockList):
         reconLabel = reconLabel + pixelBlock
 
     return reconLabel
+
+def updateLabel(subspaceLabel, kmeansLabel):
+    '''
+    input_param:
+        subspaceLabel: Labels of subspace clustering. tensor.
+        kmeansLabel: Labels of kmeans clustering. tensor.
+    output_param:
+        imgLabel: The final result of superpixels.
+    '''
+    numlab = max(kmeansLabel) + 1
+    assert numlab == len(subspaceLabel)
+
+    for i, subspace in enumerate(subspaceLabel):
+        f = torch.eq(kmeansLabel, i)
+        kmeansLabel[f] = subspace
+
+    imgLabel = kmeansLabel
+    
+    return imgLabel
 
 if __name__ == '__main__':
     test =[[[1, 1, 1],[0, 0, 0],[0, 0, 0]],

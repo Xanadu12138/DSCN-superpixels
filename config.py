@@ -9,7 +9,7 @@ trainDataPath = './datasets/images/train'
 imgSize = [321, 481]
 
 # Initialization parameters
-K = 1000
+K = 300
 # DSCN paramters
 channels = [11, 22]
 
@@ -23,12 +23,13 @@ show_frequence = 10
 
 # post clustering parameters
 alapha = 0.4 # threshold of C
-dim_subspace = 3 #dimension of each subspace
+dim_subspace = 1 #dimension of each subspace
 ro = 8
+subspaceK = 100
 
 # SLIC connectivity parmeters
-segment_size = 321 * 481 / 40
-min_size = int(0.02 * segment_size)
+segment_size = 3 * 321 * 481 / subspaceK
+min_size = int(0.001 * segment_size)
 max_size = int(3 * segment_size)
 
 # imgprocess parameters

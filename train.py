@@ -48,10 +48,8 @@ featureList = torch.cat((colorFeatureList, textureFeatureList, edgeFeatureList, 
 num_sample = len(featureList)
 
 
-featureList = featureList.cuda() if config.use_cuda else featureList
+X = featureList.cuda() if config.use_cuda else featureList
 
-
-K = 200
 
 DSCN = dscn.DSCNet(config.channels, num_sample)
 if config.use_cuda:
@@ -60,7 +58,7 @@ if config.use_cuda:
 optimizer = optim.Adam(DSCN.parameters(), lr= config.learning_rate)
 
 for epoch in range(config.num_epoch):
-    x, x_recon, z, z_recon = DSCN(x)
+    x, x_recon, z, z_recon = DSCN(X)
     loss = DSCN.loss_fn(x, x_recon, z, z_recon, weight_coef= config.weight_coef, weight_selfExp= config.weight_selfExp)
     optimizer.zero_grad()
     loss.backward()
@@ -71,7 +69,7 @@ for epoch in range(config.num_epoch):
             C = C.cpu()
         C = C.numpy()
         
-        y_pred = utilits.spectral_clustering(C, K, config.dim_subspace, config.alapha, config.ro)
+        y_pred = utilits.spectral_clustering(C, config.subspaceK, config.dim_subspace, config.alapha, config.ro)
         y_pred = y_pred.squeeze()
         # print('Epoch {:02d}: loss={:.4f}, acc={:.4f}, nmi={:.4f}'.format(epoch, loss.item() / y_pred.shape[0], acc(y, y_pred), nmi(y, y_pred)))
         print('Epoch {:02d}: loss={:.4f}'.format(epoch, loss.item() / y_pred.shape[0]))
@@ -88,20 +86,23 @@ if config.use_cuda:
 
 C = C.numpy()
 x = x.numpy()
-y_pred = utilits.spectral_clustering(C, K , config.dim_subspace, config.alapha, config.ro)
+y_pred = utilits.spectral_clustering(C, config.subspaceK , config.dim_subspace, config.alapha, config.ro)
 
 img = np.array(img)
-reconLabel = utilits.reconLabel(y_pred, pixelBlockList)
-reconLabel = reconLabel.reshape(1, 321, 481)
+reconLabel = utilits.updateLabel(y_pred, labels)
+reconLabel = reconLabel.cpu() if config.use_cuda else reconLabel
+reconLabel = reconLabel.view((1, config.imgSize[0], config.imgSize[1]))
+reconLabel = reconLabel.numpy()
 slic_result = _enforce_label_connectivity_cython(reconLabel.astype(np.int64), config.min_size, config.max_size)
 slic_result = slic_result.squeeze()
 reconLabel = reconLabel.squeeze()
+markedRecon = mark_boundaries(img, reconLabel.astype(int), color=(1,0,0))
 marked = mark_boundaries(img, slic_result.astype(int), color=(1,0,0))
 
 plt.subplot(141)
 plt.imshow(img)
 plt.subplot(142)
-plt.imshow(reconLabel)
+plt.imshow(markedRecon)
 plt.subplot(143)
 plt.imshow(slic_result)
 plt.subplot(144)
